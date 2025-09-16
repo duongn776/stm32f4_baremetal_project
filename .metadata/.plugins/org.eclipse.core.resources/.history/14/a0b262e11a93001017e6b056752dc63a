@@ -611,7 +611,7 @@ typedef struct
  * Returns port code (between 0 to 8) for a given GPIO base address
  * Used in EXTI (SYSCFG_EXTICR mapping)
  */
-#define GPIO_PORTCODE(x)      			((x == GPIOA)?0:\
+#define GPIO_BASEADDR_TO_CODE(x)      ( (x == GPIOA)?0:\
 										(x == GPIOB)?1:\
 										(x == GPIOC)?2:\
 										(x == GPIOD)?3:\

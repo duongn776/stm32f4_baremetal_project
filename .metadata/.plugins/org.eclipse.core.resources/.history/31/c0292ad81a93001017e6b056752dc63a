@@ -608,18 +608,21 @@ typedef struct
 
 
 /*
- * Returns port code (between 0 to 8) for a given GPIO base address
- * Used in EXTI (SYSCFG_EXTICR mapping)
+ *  returns port code for given GPIOx base address
  */
-#define GPIO_PORTCODE(x)      			((x == GPIOA)?0:\
+/*
+ * This macro returns a code( between 0 to 7) for a given GPIO base address(x)
+ */
+#define GPIO_BASEADDR_TO_CODE(x)      ( (x == GPIOA)?0:\
 										(x == GPIOB)?1:\
 										(x == GPIOC)?2:\
 										(x == GPIOD)?3:\
 								        (x == GPIOE)?4:\
 								        (x == GPIOF)?5:\
 								        (x == GPIOG)?6:\
-								        (x == GPIOH)?7:\
+								        (x == GPIOH)?7: \
 								        (x == GPIOI)?8:0)
+
 
 /**
  * @brief IRQ numbers for STM32F407x MCU.
