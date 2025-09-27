@@ -1,0 +1,54 @@
+/*
+ * 001led_toggle.c
+ *
+ *  Created on: Feb 1, 2019
+ *      Author: admin
+ */
+
+#include "stm32f407xx.h"
+
+
+#define LOW 0
+#define BTN_PRESSED LOW
+
+void delay(void)
+{
+	// this will introduce ~200ms delay when system clock is 16MHz
+	for(uint32_t i = 0 ; i < 500000/2 ; i ++);
+}
+
+
+int main(void)
+{
+
+	GPIO_Handle_t GpioLed, GPIOBtn;
+
+	GpioLed.pGPIOx = GPIOA;
+	GpioLed.Init.Pin = GPIO_PIN_8;
+	GpioLed.Init.Mode = GPIO_MODE_OUTPUT;
+	GpioLed.Init.Speed = GPIO_SPEED_FAST;
+	GpioLed.Init.OPType = GPIO_OPTYPE_PP;
+	GpioLed.Init.Pull = GPIO_NOPULL;
+
+	GPIO_Init(&GpioLed);
+
+	//this is btn gpio configuration
+	GPIOBtn.pGPIOx = GPIOB;
+	GPIOBtn.Init.Pin = GPIO_PIN_12;
+	GPIOBtn.Init.Mode = GPIO_MODE_INPUT;
+	GPIOBtn.Init.Pull = GPIO_PULLUP;
+
+
+	GPIO_Init(&GPIOBtn);
+
+	while(1)
+	{
+		if (GPIO_ReadPin(GPIOB, GPIO_PIN_12) == BTN_PRESSED)
+		{
+			delay();
+			GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+		}
+
+	}
+	return 0;
+}

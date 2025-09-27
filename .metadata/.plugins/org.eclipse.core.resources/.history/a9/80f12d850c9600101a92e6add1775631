@@ -1,0 +1,69 @@
+/*
+ * 001led_toggle.c
+ *
+ *  Created on: Feb 1, 2019
+ *      Author: admin
+ */
+
+#include "stm32f407xx.h"
+
+
+#define BTN_PRESSED 0
+
+void delay(void)
+{
+	for(uint32_t i = 0 ; i < 500000/2 ; i ++);
+}
+
+int cnt = 0;
+
+int main(void)
+{
+
+	GPIO_Handle_t GpioLed, GPIOBtn;
+
+	GpioLed.pGPIOx = GPIOD;
+	GpioLed.Init.Pin = GPIO_PIN_12;
+	GpioLed.Init.Mode = GPIO_MODE_OUTPUT;
+	GpioLed.Init.Speed = GPIO_SPEED_FAST;
+	GpioLed.Init.OPType = GPIO_OPTYPE_PP;
+	GpioLed.Init.Pull = GPIO_NOPULL;
+
+	GPIO_Init(&GpioLed);
+	GpioLed.Init.Pin = GPIO_PIN_13;
+	GPIO_Init(&GpioLed);
+	GpioLed.Init.Pin = GPIO_PIN_14;
+	GPIO_Init(&GpioLed);
+	GpioLed.Init.Pin = GPIO_PIN_15;
+	GPIO_Init(&GpioLed);
+	//this is btn gpio configuration
+	GPIOBtn.pGPIOx = GPIOA;
+	GPIOBtn.Init.Pin = GPIO_PIN_0;
+	GPIOBtn.Init.Mode = GPIO_MODE_INPUT;
+	GPIOBtn.Init.Pull = GPIO_NOPULL;
+
+
+	GPIO_Init(&GPIOBtn);
+
+	while(1)
+	{
+		if (GPIO_ReadPin(GPIOA, GPIO_PIN_0) == BTN_PRESSED)
+		{
+			delay();
+			GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+			cnt++;
+			if (cnt == 3)
+			{
+				GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+				delay();
+				GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+				delay();
+				GPIO_TogglePin(GPIOD, GPIO_PIN_15);
+				delay();
+				cnt = 0;
+			}
+		}
+
+	}
+	return 0;
+}

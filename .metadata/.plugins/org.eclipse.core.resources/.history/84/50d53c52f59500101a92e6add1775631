@@ -1,0 +1,172 @@
+/*
+ * stm32f407xx_GPIO_Driver.c
+ *
+ *  Created on: Sep 20, 2025
+ *      Author: nhduong
+ */
+
+#include <stm32f407xx_GPIO_Driver.h>
+
+/**
+  * @brief  Initializes the GPIOx peripheral clock
+  * @param  GPIOx where x can be (A..I) to select the GPIO peripheral .
+  * @param  clockState Specifies whether to ENABLE or DISABLE of the clock for the given GPIO peripheral.
+  * @retval None
+  */
+void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t clockState)
+{
+    /* Enable or Disable peripheral clock */
+    if (clockState == ENABLE) {
+        if (pGPIOx == GPIOA) {
+            GPIOA_CLK_ENABLE();
+        }else if (pGPIOx == GPIOB) {
+            GPIOB_CLK_ENABLE();
+        }else if (pGPIOx == GPIOC) {
+            GPIOC_CLK_ENABLE();
+        }else if (pGPIOx == GPIOD) {
+            GPIOD_CLK_ENABLE();
+        }else if (pGPIOx == GPIOE) {
+            GPIOE_CLK_ENABLE();
+        }else if (pGPIOx == GPIOF) {
+            GPIOF_CLK_ENABLE();
+        }else if (pGPIOx == GPIOG) {
+            GPIOG_CLK_ENABLE();
+        }else if (pGPIOx == GPIOH) {
+            GPIOH_CLK_ENABLE();
+        }else if (pGPIOx == GPIOI) {
+            GPIOI_CLK_ENABLE();
+        }
+    }else {	/* Disable clock */
+        if (pGPIOx == GPIOA) {
+            GPIOA_CLK_DISABLE();
+        }else if (pGPIOx == GPIOB) {
+            GPIOB_CLK_DISABLE();
+        }else if (pGPIOx == GPIOC) {
+            GPIOC_CLK_DISABLE();
+        }else if (pGPIOx == GPIOD) {
+            GPIOD_CLK_DISABLE();
+        }else if (pGPIOx == GPIOE) {
+            GPIOE_CLK_DISABLE();
+        }else if (pGPIOx == GPIOF) {
+            GPIOF_CLK_DISABLE();
+        }else if (pGPIOx == GPIOG) {
+            GPIOG_CLK_DISABLE();
+        }else if (pGPIOx == GPIOH) {
+            GPIOH_CLK_DISABLE();
+        }else if (pGPIOx == GPIOI) {
+            GPIOI_CLK_DISABLE();
+        }
+    }
+}
+
+
+void GPIO_Init(GPIO_Handle_t *hGPIO)
+{
+	uint32_t tempreg = 0;
+
+	/* Enable Clock for GPIOx */
+	GPIO_PeriClockControl(hGPIO->pGPIOx, ENABLE);
+
+	/*--------------------- GPIO Mode Configuration ------------------------*/
+	if (hGPIO->Init.Mode <= GPIO_MODE_ANALOG)
+	{
+		/* non interrupt mode */
+		tempreg = (hGPIO->Init.Mode << (2 * hGPIO->Init.Pin));
+		hGPIO->pGPIOx->MODER &= ~(0x3 << (2 * hGPIO->Init.Pin)); // clearing
+		hGPIO->pGPIOx->MODER |= tempreg; // setting
+	}else
+	{
+		/* interrupt mode */
+	}
+
+	/* Configure the IO Output Type */
+	tempreg = hGPIO->Init.OPType << hGPIO->Init.Pin;
+	hGPIO->pGPIOx->OTYPER &= ~(0x1 << hGPIO->Init.Pin);
+	hGPIO->pGPIOx->OTYPER |= tempreg;
+
+	/* Configure the  IO output speed */
+	tempreg = (hGPIO->Init.Speed << (2 * hGPIO->Init.Pin));
+	hGPIO->pGPIOx->OSPEEDR &= ~(0x3 << (2 * hGPIO->Init.Pin));
+	hGPIO->pGPIOx->OSPEEDR |= tempreg;
+
+	 /* Activate the Pull-up or Pull down resistor for the current IO */
+	tempreg = hGPIO->Init.Pull << hGPIO->Init.Pin;
+	hGPIO->pGPIOx->PUPDR &= ~(0x1 << hGPIO->Init.Pin);
+	hGPIO->pGPIOx->PUPDR |= tempreg;
+
+	 /* In case of Alternate function mode selection */
+	if (hGPIO->Init.Mode == GPIO_MODE_AF)
+	{
+		uint8_t tmp1, tmp2;
+
+		/* Configure Alternate function mapped with the current IO */
+		tmp1 = hGPIO->Init.Pin / 8;
+		tmp2 = hGPIO->Init.Pin % 8;
+		hGPIO->pGPIOx->AFR[tmp1] &= ~(0xF << (4 * tmp2)); // clearing
+		hGPIO->pGPIOx->AFR[tmp1] |= (hGPIO->Init.Alternate << (4 * tmp2)); // setting
+	}
+}
+
+/**
+  * @brief  De-initializes the GPIOx peripheral registers to their default reset values.
+  * @param  GPIOx where x can be (A..I) to select the GPIO peripheral.
+  * @retval None
+  */
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx)
+{
+    if(pGPIOx == GPIOA)
+    {
+        GPIOA_REG_RESET();
+    }else if (pGPIOx == GPIOB)
+    {
+        GPIOB_REG_RESET();
+    }else if (pGPIOx == GPIOC)
+    {
+        GPIOC_REG_RESET();
+    }else if (pGPIOx == GPIOD)
+    {
+        GPIOD_REG_RESET();
+    }else if (pGPIOx == GPIOE)
+    {
+        GPIOE_REG_RESET();
+    }else if (pGPIOx == GPIOF)
+    {
+        GPIOF_REG_RESET();
+    }else if (pGPIOx == GPIOG)
+    {
+        GPIOG_REG_RESET();
+    }else if (pGPIOx == GPIOH)
+    {
+        GPIOH_REG_RESET();
+    }else if (pGPIOx == GPIOI)
+    {
+        GPIOI_REG_RESET();
+    }
+}
+
+/**
+  * @brief  Reads the specified input pin.
+  * @param  pGPIOx where x can be (A..I) to select the GPIO peripheral.
+  * @param  GPIO_pin specifies the bit to read.
+  *         This parameter can be GPIO_PIN_x where x can be (0..15).
+  * @retval Pin state (0 = LOW, 1 = HIGH).
+  */
+uint8_t GPIO_ReadPin(GPIO_RegDef_t *pGPIOx, uint8_t GPIO_pin)
+{
+	uint8_t pinState;
+
+	pinState = (uint8_t)((pGPIOx->IDR >> GPIO_pin) & /**
+	  * @brief  Reads the specified input pin.
+	  * @param  pGPIOx where x can be (A..I) to select the GPIO peripheral.
+	  * @param  GPIO_pin specifies the bit to read.
+	  *         This parameter can be GPIO_PIN_x where x can be (0..15).
+	  * @retval Pin state (0 = LOW, 1 = HIGH).
+	  */)
+}
+uint16_t GPIO_ReadPort(GPIO_RegDef_t *pGPIOx);
+void GPIO_WritePin(GPIO_RegDef_t *pGPIOx, uint8_t GPIO_pin, uint8_t pinState);
+void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t GPIO_pin);
+void GPIO_TogglePin(GPIO_RegDef_t* pGPIOx, uint8_t GPIO_pin);
+void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t state);
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority);
+void GPIO_IRQHandler(uint8_t GPIO_pin);
